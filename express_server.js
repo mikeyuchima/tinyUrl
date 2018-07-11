@@ -23,13 +23,14 @@ app.get("/urls.json", (req, res) => {
     res.json(urlDatabase);
 });
 
-app.get("/login", (req, res) => {
-    res.render("_header")
-});
-
 app.post("/login", (req, res) => {
     res.cookie('member', req.body.username);
     res.redirect("/urls");
+});
+
+app.get("/logout", (req, res) => {
+    res.clearCookie('member');
+    res.redirect('/urls');
 });
 
 app.get("/urls", (req, res) => {
@@ -48,7 +49,7 @@ app.post("/urls", (req, res) => {
 });
 
 app.get("/urls/:id", (req, res) => {
-    let templateVars = { shortURL: req.params.id, longURL: urlDatabase[req.params.id] };
+    let templateVars = { shortURL: req.params.id, longURL: urlDatabase[req.params.id], username: req.cookies["username"] };
     res.render("urls_show", templateVars);
   });
 
