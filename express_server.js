@@ -52,6 +52,10 @@ app.listen(PORT, () => {
 });
 
 function generateRandomString() {
-    let rand = Math.floor(Math.random() * Math.floor(10));
+    let rand = '';
+    
+    for (let i = 0; i < 6; i++) {
+        rand += Math.floor(Math.random() * Math.floor(10));
+    }
     return rand
 }
