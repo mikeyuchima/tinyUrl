@@ -47,15 +47,34 @@ app.get("/u/:shortURL", (req, res) => {
     res.redirect(longURL);
 });
 
+app.get("/urls/:id/update", (req, res) => {
+    res.render("urls_show", { shortURL: req.params.id });
+});
+
+app.post("/urls/:id/update", (req, res) => {
+    let shortUrl = req.params.id;
+    let longURL = req.body.longURL;
+    console.log(req.params);
+    console.log(req.body)
+    urlDatabase[shortUrl] = longURL; //.body/.params????
+    res.render("urls_index", { urls: urlDatabase });
+});
+
+app.post("/urls/:id/delete", (req ,res) => {
+    delete urlDatabase[req.params.id];
+    let templateVars = { urls: urlDatabase };
+    res.render("urls_index", templateVars);
+});
+
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
 
 function generateRandomString() {
     let rand = '';
-    
+
     for (let i = 0; i < 6; i++) {
         rand += Math.floor(Math.random() * Math.floor(10));
     }
-    return rand
+    return rand;
 }
