@@ -1,12 +1,14 @@
 var express = require("express");
 var app = express();
 var PORT = 8080; // default port 8080
-
+var express = require('express')
+var cookieParser = require('cookie-parser')
 const bodyParser = require("body-parser");
 
+app.use(cookieParser())
 app.use(bodyParser.urlencoded({extended: true}));
-
 app.set("view engine", "ejs");
+
 
 var urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
@@ -21,8 +23,17 @@ app.get("/urls.json", (req, res) => {
     res.json(urlDatabase);
 });
 
+app.get("/login", (req, res) => {
+    res.render("_header")
+});
+
+app.post("/login", (req, res) => {
+    res.cookie('member', req.body.username);
+    res.redirect("/urls");
+});
+
 app.get("/urls", (req, res) => {
-    let templateVars = { urls: urlDatabase };
+    let templateVars = { urls: urlDatabase, username: req.cookies["member"] };
     res.render("urls_index", templateVars);
 });
 
@@ -54,16 +65,14 @@ app.get("/urls/:id/update", (req, res) => {
 app.post("/urls/:id/update", (req, res) => {
     let shortUrl = req.params.id;
     let longURL = req.body.longURL;
-    console.log(req.params);
-    console.log(req.body)
     urlDatabase[shortUrl] = longURL; //.body/.params????
-    res.render("urls_index", { urls: urlDatabase });
+    res.redirect("/urls");
 });
 
 app.post("/urls/:id/delete", (req ,res) => {
     delete urlDatabase[req.params.id];
     let templateVars = { urls: urlDatabase };
-    res.render("urls_index", templateVars);
+    res.redirect("/urls");
 });
 
 app.listen(PORT, () => {
