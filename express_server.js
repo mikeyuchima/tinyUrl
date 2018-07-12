@@ -23,24 +23,22 @@ app.use(function (req, res, next) {
 var urlDatabase = {
     "ID1": {
         "b2xVn2": "http://www.lighthouselabs.ca",
-        "9sm5xK": "http://www.google.com"
-    },
-    "ID2": {
-        "b2xVn2": "http://www.lighthouselabs.ca",
-        "9sm5xK": "http://www.google.com"
-    },
+        "9sm5xK": "http://www.google.com",
+    }
 };
 
 var users = { 
     "ID1": {
         id: "ID1", 
         email: "user@example.com", 
-        password: "pw1"
+        password: "pw1",
+        urlLibrary: [],
     },
     "ID2": {
         id: "ID2", 
         email: "user2@example.com", 
-        password: "pw2"
+        password: "pw2",
+        urlLibrary: [],
     }
 }
 
@@ -67,7 +65,7 @@ app.post("/register", (req, res) => {
         res.send('404 ERROR');
     } else if (req.body.email && req.body.password) {
         let idGen = generateRandomString();
-        users[idGen] = {id : idGen, email: req.body.email, password: req.body.password};
+        users[idGen] = {id : idGen, email: req.body.email, password: req.body.password, urlLibrary: []};
         urlDatabase[idGen] = {'shortURL': 'longURL'}
         res.cookie('user_id', idGen)
         res.redirect("/urls");
@@ -137,7 +135,7 @@ app.get("/urls/new", (req, res) => {
 app.post("/urls", (req, res) => {
     if (users[req.cookies['user_id']]) {
     let shrtURL = generateRandomString();
-    urlDatabase[shrtURL] = req.body.longURL;
+    urlDatabase[req.cookies['user_id']][shrtURL] = req.body.longURL;
     res.redirect(`http://localhost:8080/urls/${shrtURL}`)
     } else {
         res.redirect('/login');
@@ -145,7 +143,6 @@ app.post("/urls", (req, res) => {
 });
 
 app.get("/urls/:id", (req, res) => {
-    // let templateVars = { shortURL: req.params.id, longURL: urlDatabase[req.params.id], username: req.cookies['user_id'] };
     res.redirect('/urls');
   });
 //____________________________________________________________________________________________________________//
@@ -153,8 +150,20 @@ app.get("/urls/:id", (req, res) => {
 //EXECUTE TINYURL_____________________________________________________________________________________________//
 app.get("/u/:shortURL", (req, res) => {
     let shortUrl = req.params.shortURL;
-    let longURL = urlDatabase[shortUrl];
-    res.redirect(longURL);
+
+    for (var element in urlDatabase) {
+        console.log(element)
+        for (var element2 in urlDatabase[element]) {
+            console.log(element2)
+            console.log(shortUrl)
+            if (shortUrl == element2){
+                let longURL = urlDatabase[element][element2];
+                console.log(longURL)
+                res.redirect(longURL);
+                return;
+            }
+        }
+    }
 });
 //____________________________________________________________________________________________________________//
 
@@ -166,7 +175,7 @@ app.get("/urls/:id/update", (req, res) => {
 app.post("/urls/:id/update", (req, res) => {
     let shortUrl = req.params.id;
     let longURL = req.body.longURL;
-    urlDatabase[shortUrl] = longURL; //.body/.params????
+    urlDatabase[req.cookies['user_id']][shortUrl] = longURL; //.body/.params????
     res.redirect("/urls");
 });
 //____________________________________________________________________________________________________________//
@@ -174,7 +183,7 @@ app.post("/urls/:id/update", (req, res) => {
 
 //DELETE______________________________________________________________________________________________________//
 app.post("/urls/:id/delete", (req ,res) => {
-    delete urlDatabase[req.params.id];
+    delete urlDatabase[req.cookies['user_id']][req.params.id];
     res.redirect("/urls");
 });
 //____________________________________________________________________________________________________________//
@@ -201,4 +210,9 @@ function generateRandomString() {
     }
     return rand;
 }
+
+// function uniqueID(id){
+//     let url = {};
+
+// }
 //____________________________________________________________________________________________________________//
