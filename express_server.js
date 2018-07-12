@@ -9,10 +9,26 @@ app.use(cookieParser())
 app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
 
+app.use(function (req, res, next) {
+    // console.log(req.method + ": " +req.path);
+    console.log(req.cookies);
+    console.log('____________________________');
+    console.log(users);
+    console.log('____________________________');
+    console.log(urlDatabase);
+    console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+    next();
+});
 
 var urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+    "ID1": {
+        "b2xVn2": "http://www.lighthouselabs.ca",
+        "9sm5xK": "http://www.google.com"
+    },
+    "ID2": {
+        "b2xVn2": "http://www.lighthouselabs.ca",
+        "9sm5xK": "http://www.google.com"
+    },
 };
 
 var users = { 
@@ -52,6 +68,7 @@ app.post("/register", (req, res) => {
     } else if (req.body.email && req.body.password) {
         let idGen = generateRandomString();
         users[idGen] = {id : idGen, email: req.body.email, password: req.body.password};
+        urlDatabase[idGen] = {'shortURL': 'longURL'}
         res.cookie('user_id', idGen)
         res.redirect("/urls");
     } 
@@ -107,7 +124,7 @@ app.get("/logout", (req, res) => {
 
 //HOME________________________________________________________________________________________________________//
 app.get("/urls", (req, res) => {
-    let templateVars = { urls: urlDatabase, user: users[req.cookies['user_id']] };
+    let templateVars = { urls: urlDatabase[req.cookies['user_id']], user: users[req.cookies['user_id']] };
     res.render("urls_index", templateVars);
 });
 //____________________________________________________________________________________________________________//
