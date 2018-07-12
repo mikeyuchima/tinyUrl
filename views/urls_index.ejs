@@ -4,7 +4,9 @@
 </head>
 <body>
 <% include partials/_header %>
-<h4>Hello <%= username %> </h4>
+
+    <hr/>
+    
     <h1>URL</h1>
     <% for (var i in urls) { %>
     <li><%= urls[i] %> -> <%= i %>  %></li>
@@ -13,6 +15,12 @@
     </form>
     <a href="/urls/<%= i %>/update">edit</a>
     <% }; %>
+    
+    <hr/>
+
+    <form method = "GET" action = "/urls/new">
+    <input type = "submit" value = "New">
+    </form>
 
 </body>
 </html>
